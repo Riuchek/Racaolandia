@@ -29,7 +29,7 @@ const handleLogin = async () => {
     <div class="max-w-md w-full space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
+          Entrar no sistema RaçãoLandia
         </h2>
       </div>
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
@@ -47,7 +47,7 @@ const handleLogin = async () => {
             />
           </div>
           <div>
-            <label for="password" class="sr-only">Password</label>
+            <label for="password" class="sr-only">Senha</label>
             <input
               id="password"
               v-model="password"
@@ -55,7 +55,7 @@ const handleLogin = async () => {
               type="password"
               required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
+              placeholder="Senha"
             />
           </div>
         </div>
@@ -81,7 +81,7 @@ const handleLogin = async () => {
                 />
               </svg>
             </span>
-            {{ loading ? 'Signing in...' : 'Sign in' }}
+            {{ loading ? 'Entrando...' : 'Entrar' }}
           </button>
           <p v-if="errorLogin" class="text-red-500 text-sm">
             Login ou senha incorretos

@@ -3,6 +3,7 @@ const constraints = ref<string>('')
 const variable = ref<string>('')
 const constraintsList = ref<string[]>([])
 const variablesList = ref<string[]>([])
+const objective = ref('maximize')
 
 const addConstraint = () => {
   constraintsList.value.push(constraints.value)
@@ -38,9 +39,33 @@ const handleSubmit = () => {
       </div>
 
       <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
+        <div class="flex justify-center gap-6 mt-4">
+          <label class="inline-flex items-center">
+            <input
+              type="radio"
+              class="form-radio text-indigo-600"
+              name="objective"
+              value="maximize"
+              v-model="objective"
+            />
+            <span class="ml-2 text-gray-700">Maximizar</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input
+              type="radio"
+              class="form-radio text-indigo-600"
+              name="objective"
+              value="minimize"
+              v-model="objective"
+            />
+            <span class="ml-2 text-gray-700">Minimizar</span>
+          </label>
+        </div>
+
         <div class="rounded-md shadow-sm space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Restrições</label>
+
             <div v-for="(constraint, index) in constraintsList" :key="index" class="mt-2 flex gap-2">
               <input
                 v-model="constraintsList[index]"
@@ -56,6 +81,7 @@ const handleSubmit = () => {
                 Remover
               </button>
             </div>
+
             <button
               type="button"
               @click="addConstraint"
@@ -63,6 +89,7 @@ const handleSubmit = () => {
             >
               Adicionar Restrição
             </button>
+
           </div>
         </div>
 
