@@ -5,8 +5,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { login, password } = body
 
-    // TODO: In a real application, you should validate against a database
-    // This is just a simple example
+    
     if (login === 'admin' && password === 'admin') {
       return {
         success: true,

@@ -3,9 +3,6 @@ const login = ref('')
 const password = ref('')
 const loading = ref(false)
 
-const loginRef = 'admin'
-const passwordRef = 'admin'
-
 const errorLogin = ref(false)
 
 interface LoginResponse {
