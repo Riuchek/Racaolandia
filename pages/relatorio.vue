@@ -4,6 +4,9 @@ const variable = ref<string>('')
 const constraintsList = ref<string[]>([])
 const variablesList = ref<string[]>([])
 const objective = ref('maximize')
+const loading = ref(false)
+const error = ref(false)
+const success = ref(false)
 
 const addConstraint = () => {
   constraintsList.value.push(constraints.value)
@@ -21,8 +24,37 @@ const removeVariable = (index: number) => {
   variablesList.value.splice(index, 1)
 }
 
-const handleSubmit = () => {
-  
+const handleSubmit = async () => {
+  loading.value = true
+  error.value = false
+  success.value = false
+
+  try {
+    const response = await $fetch('/api/reports', {
+      method: 'POST',
+      body: {
+        objective: objective.value,
+        variables: variablesList.value,
+        constraints: constraintsList.value
+      }
+    }) as { success?: boolean }
+
+    if (response && response.success) {
+      success.value = true
+      // Clear form
+      objective.value = 'maximize'
+      variablesList.value = []
+      constraintsList.value = []
+      variable.value = ''
+      constraints.value = ''
+    } else {
+      error.value = true
+    }
+  } catch (err) {
+    error.value = true
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -121,11 +153,18 @@ const handleSubmit = () => {
         <div>
           <button
             type="submit"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            :disabled="loading"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Resolver
+            {{ loading ? 'Salvando...' : 'Salvar' }}
           </button>
         </div>
+        <p v-if="error" class="mt-2 text-sm text-red-600">
+          Erro ao salvar o relatório. Tente novamente.
+        </p>
+        <p v-if="success" class="mt-2 text-sm text-green-600">
+          Relatório salvo com sucesso!
+        </p>
       </form>
     </div>
   </div>

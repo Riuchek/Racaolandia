@@ -7,14 +7,31 @@ const loginRef = 'admin'
 const passwordRef = 'admin'
 
 const errorLogin = ref(false)
+
+interface LoginResponse {
+  success: boolean
+  message: string
+  user?: {
+    login: string
+    role: string
+  }
+}
+
 const handleLogin = async () => {
   loading.value = true
   try {
-    // TODO: Implement login logic here
-    if (login.value === loginRef && password.value === passwordRef) {
-        navigateTo('/relatorio')
+    const response = await $fetch<LoginResponse>('/api/login', {
+      method: 'POST',
+      body: {
+        login: login.value,
+        password: password.value
+      }
+    })
+
+    if (response.success) {
+      navigateTo('/relatorio')
     } else {
-        errorLogin.value = true
+      errorLogin.value = true
     }
   } catch (error) {
     errorLogin.value = true
