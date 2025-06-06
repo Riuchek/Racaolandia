@@ -113,12 +113,11 @@ const handleSubmit = async () => {
                 v-model="constraintsOperators[index]"
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
-                <option value="">Selecione</option>
-                <option value="<"><</option>
-                <option value=">">></option>
-                <option value="=">=</option>
-                <option value=">=">>=</option>
-                <option value="<="><=</option>
+                <option value="<">Maior que (<)</option>
+                <option value=">">Menor que (>)</option>
+                <option value="=">Igual a (=)</option>
+                <option value=">=">Maior ou igual a (>=)</option>
+                <option value="<=">Menor ou igual a (<=)</option>
               </select>
               <input
                 v-model="constraintsValues[index]"
