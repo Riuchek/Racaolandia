@@ -24,6 +24,11 @@ const removeVariable = (index: number) => {
   variablesList.value.splice(index, 1)
 }
 
+const constraintsValues = ref<number[]>([])
+const constraintsOperators = ref<string[]>([])
+
+
+
 const handleSubmit = async () => {
   loading.value = true
   error.value = false
@@ -41,7 +46,6 @@ const handleSubmit = async () => {
 
     if (response && response.success) {
       success.value = true
-      // Clear form
       objective.value = 'maximize'
       variablesList.value = []
       constraintsList.value = []
@@ -98,10 +102,27 @@ const handleSubmit = async () => {
           <div>
             <label class="block text-sm font-medium text-gray-700">Restrições</label>
 
-            <div v-for="(constraint, index) in constraintsList" :key="index" class="mt-2 flex gap-2">
+          <div v-for="(constraint, index) in constraintsList" :key="index" class="mt-2 flex gap-2">
               <input
                 v-model="constraintsList[index]"
                 type="text"
+                placeholder="e.g., ração + peixe < = or > 10"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+              <select
+                v-model="constraintsOperators[index]"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="">Selecione</option>
+                <option value="<"><</option>
+                <option value=">">></option>
+                <option value="=">=</option>
+                <option value=">=">>=</option>
+                <option value="<="><=</option>
+              </select>
+              <input
+                v-model="constraintsValues[index]"
+                type="number"
                 placeholder="e.g., ração + peixe <= 10"
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
