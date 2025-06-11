@@ -26,7 +26,7 @@ const handleLogin = async () => {
     })
 
     if (response.success) {
-      navigateTo('/relatorio')
+      navigateTo('/otimizacaoSimplex')
     } else {
       errorLogin.value = true
     }
