@@ -137,7 +137,7 @@ const handleSubmit = async () => {
               Adicione pelo menos uma variável antes de criar restrições
             </p>
 
-            <div v-else v-for="(variable, index) in variablesList" :key="index" class="mt-2 flex gap-2">
+            <div v-else v-for="(constraint, index) in constraintsList" :key="index" class="mt-2 flex gap-2">
               <input
                 v-model="constraintsList[index]"
                 type="text"
