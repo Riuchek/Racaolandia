@@ -18,19 +18,98 @@ export function solveSimplexStructured(
   objectiveCoefficients: number[],
   constraints: Constraint[]
 ): SimplexResult {
-
+  // Convert constraints to matrix form
   const { A, b } = convertConstraintsToMatrix(constraints)
   
-
-  const { tableau, basicVars } = convertToStandardForm(A, b, objectiveCoefficients, maximize)
+  // Check if we need two-phase simplex
+  const needsTwoPhase = b.some(value => value < 0) || !maximize
   
+  if (needsTwoPhase) {
+    return solveTwoPhaseSimplex(maximize, variables, objectiveCoefficients, A, b)
+  } else {
+    // Convert to standard form
+    const { tableau, basicVars } = convertToStandardForm(A, b, objectiveCoefficients, maximize)
+    
+    // Run Simplex algorithm
+    const { optimalValue, solution, iterations } = runSimplex(tableau, basicVars, variables, maximize)
+    
+    return {
+      optimalValue,
+      optimalSolution: solution,
+      iterations
+    }
+  }
+}
 
-  const { optimalValue, solution, iterations } = runSimplex(tableau, basicVars, variables, maximize)
+function solveTwoPhaseSimplex(
+  maximize: boolean,
+  variables: string[],
+  objectiveCoefficients: number[],
+  A: Matrix,
+  b: number[]
+): SimplexResult {
+  const m = A.size()[0] 
+  const n = A.size()[1] 
+  
+  
+  const phase1Tableau = matrix(zeros(m + 1, n + m + 1))
+  
+  
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+      phase1Tableau.set([i, j], A.get([i, j]))
+    }
+    
+    phase1Tableau.set([i, n + i], 1)
+    
+    phase1Tableau.set([i, n + m], b[i])
+  }
+  
+  
+  for (let j = 0; j < n; j++) {
+    let sum = 0
+    for (let i = 0; i < m; i++) {
+      sum += A.get([i, j])
+    }
+    phase1Tableau.set([m, j], -sum)
+  }
+  
+  
+  const phase1BasicVars = range(n, n + m).toArray() as number[]
+  
+  
+  const phase1Result = runSimplex(phase1Tableau, phase1BasicVars, variables, false)
+  
+  
+  if (Math.abs(phase1Result.optimalValue) > 1e-10) {
+    throw new Error('Problema não possui solução viável')
+  }
+  
+  
+  const phase2Tableau = matrix(zeros(m + 1, n + m + 1))
+  
+  
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n + m + 1; j++) {
+      phase2Tableau.set([i, j], phase1Tableau.get([i, j]))
+    }
+  }
+  
+  
+  for (let j = 0; j < n; j++) {
+    phase2Tableau.set([m, j], maximize ? -objectiveCoefficients[j] : objectiveCoefficients[j])
+  }
+  
+  
+  const phase2BasicVars = [...phase1BasicVars]
+  
+  
+  const phase2Result = runSimplex(phase2Tableau, phase2BasicVars, variables, maximize)
   
   return {
-    optimalValue,
-    optimalSolution: solution,
-    iterations
+    optimalValue: phase2Result.optimalValue,
+    optimalSolution: phase2Result.solution,
+    iterations: phase1Result.iterations + phase2Result.iterations
   }
 }
 

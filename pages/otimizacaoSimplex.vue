@@ -102,6 +102,8 @@ const handleSubmit = async () => {
       }))
     }
 
+
+
     const response = await $fetch<{
       success: boolean
       solution?: {
@@ -115,6 +117,7 @@ const handleSubmit = async () => {
       body: simplexData
     })
 
+
     if (response.success && response.solution) {
       solution.value = response.solution
       success.value = true
@@ -123,6 +126,7 @@ const handleSubmit = async () => {
     }
 
   } catch (err: any) {
+    console.error('Error in handleSubmit:', err)
     error.value = err.message || 'Erro ao processar a otimização'
   } finally {
     loading.value = false

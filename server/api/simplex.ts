@@ -1,4 +1,4 @@
-import { solveSimplexStructured } from '~/server/utils/simplex'
+import solver from 'javascript-lp-solver'
 
 interface SimplexRequest {
   objective: 'maximize' | 'minimize'
@@ -62,18 +62,55 @@ export default defineEventHandler(async (event): Promise<SimplexResponse> => {
       }
     }
 
-    const solution = solveSimplexStructured(
-      body.objective === 'maximize',
-      body.variables,
-      body.objectiveCoefficients,
-      body.constraints
-    )
+    const model: any = {
+      optimize: 'obj',
+      opType: body.objective === 'maximize' ? 'max' : 'min',
+      constraints: {},
+      variables: {},
+    }
+
+    body.constraints.forEach((constraint, i) => {
+      const cname = `c${i}`
+      model.constraints[cname] = {}
+      if (constraint.operator === '<=' || constraint.operator === '≤') {
+        model.constraints[cname].max = constraint.value
+      } else if (constraint.operator === '>=') {
+        model.constraints[cname].min = constraint.value
+      } else if (constraint.operator === '=') {
+        model.constraints[cname].equal = constraint.value
+      }
+    })
+
+    body.variables.forEach((v, vIdx) => {
+      model.variables[v] = { obj: body.objectiveCoefficients[vIdx] }
+      body.constraints.forEach((constraint, cIdx) => {
+        const cname = `c${cIdx}`
+        model.variables[v][cname] = constraint.coefficients[vIdx]
+      })
+    })
+
+    const result = solver.Solve(model)
+    console.log('Solver result:', result)
+    
+    if (!result.feasible) {
+      return { success: false, error: 'Problema não possui solução viável' }
+    }
+
+    const optimalSolution: Record<string, number> = {}
+    body.variables.forEach(v => {
+      optimalSolution[v] = typeof result[v] === 'number' ? result[v] : 0
+    })
+
+    const optimalValue = typeof result.result === 'number' ? result.result : 0
 
     return {
       success: true,
-      solution
+      solution: {
+        optimalValue,
+        optimalSolution,
+        iterations: result.iterations || 0
+      }
     }
-
   } catch (error: any) {
     console.error('Simplex error:', error)
     return {
